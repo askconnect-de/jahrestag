@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vier Jahre — ein Spiel für uns zwei</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FD267D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#FD267D;
+    --orange:#FF6036;
+    --brand:linear-gradient(135deg,#FD267D 0%,#FF6036 100%);
+    --like:#21D07C;
+    --like-deep:#12A862;
+    --nope:#FE3B5E;
+    --rewind:#FFB800;
+    --ink:#20202C;
+    --ink-soft:#5A5A6B;
+    --muted:#9B9BAC;
+    --paper:#FFFFFF;
+    --line:#EFEFF4;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --pop:cubic-bezier(.34,1.56,.64,1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+
+  body{
+    background:
+      radial-gradient(90% 60% at 12% 0%,  rgba(253,38,125,.13) 0%, rgba(253,38,125,0) 60%),
+      radial-gradient(80% 55% at 92% 8%,  rgba(255,96,54,.14) 0%, rgba(255,96,54,0) 62%),
+      radial-gradient(70% 50% at 50% 100%,rgba(33,208,124,.10) 0%, rgba(33,208,124,0) 60%),
+      #FFF8F6;
+    color:var(--ink);
+    font-family:Poppins,-apple-system,"Segoe UI",sans-serif;
+    font-weight:400;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  .app{
+    position:relative;
+    min-height:100dvh;
+    max-width:26rem;margin:0 auto;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:clamp(18px,5vw,26px) clamp(18px,5vw,24px) clamp(26px,7vw,36px);
+  }
+
+  .screen{display:none}
+  .screen[data-active]{display:block;animation:rise .45s var(--ease) both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  /* ─────────── Typo ─────────── */
+  h1{
+    font-family:"Baloo 2",cursive;font-weight:800;
+    font-size:clamp(2.7rem,13vw,3.6rem);line-height:1.02;
+    letter-spacing:-.01em;
+    background:var(--brand);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{font-size:1.02rem;line-height:1.6;color:var(--ink-soft);margin-top:16px;max-width:30ch}
+  .signoff{margin-top:12px;color:var(--muted);font-size:.92rem;max-width:30ch}
+
+  .hero{font-size:3.4rem;line-height:1;margin-bottom:14px;animation:sway 3.4s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(-7px)}}
+
+  /* ─────────── Fortschritt: Story-Segmente ─────────── */
+  .segments{display:flex;gap:3px;margin-bottom:14px;height:4px}
+  .segments i{
+    flex:1;border-radius:99px;background:#EBE3E6;
+    transition:background .3s var(--ease);
+  }
+  .segments i[data-on]{background:var(--pink)}
+  .segments i[data-on="warm"]{background:var(--orange)}
+
+  .steps{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:.76rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px;
+  }
+  .steps .num{font-variant-numeric:tabular-nums}
+
+  /* ─────────── Kartenstapel ─────────── */
+  .deck{
+    position:relative;
+    height:clamp(330px,54vh,440px);
+    margin-bottom:clamp(18px,4vw,24px);
+  }
+
+  .card{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    border-radius:26px;
+    background:var(--paper);
+    overflow:hidden;
+    box-shadow:0 2px 6px rgba(32,32,44,.06), 0 18px 40px rgba(32,32,44,.14);
+    touch-action:none;
+    user-select:none;-webkit-user-select:none;
+    cursor:grab;
+    will-change:transform;
+  }
+  .card:active{cursor:grabbing}
+  .card.settle{transition:transform .42s var(--ease), opacity .42s var(--ease)}
+
+  /* Der bunte Teil, wo bei Tinder das Foto wäre */
+  .art{
+    flex:1 1 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-size:clamp(4.4rem,20vw,6rem);
+    line-height:1;
+    position:relative;
+  }
+  .art::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(255,255,255,0) 62%,rgba(255,255,255,.55) 100%);
+  }
+  .art span{position:relative;z-index:1;filter:drop-shadow(0 8px 16px rgba(32,32,44,.16))}
+
+  .caption{
+    flex:0 0 auto;
+    padding:clamp(20px,5vw,26px) clamp(22px,6vw,28px) clamp(24px,6vw,30px);
+    background:var(--paper);
+  }
+  .caption p{
+    font-family:"Baloo 2",cursive;font-weight:600;
+    font-size:clamp(1.28rem,5.2vw,1.6rem);
+    line-height:1.22;color:var(--ink);
+    text-wrap:balance;
+  }
+
+  /* LIKE / NOPE Stempel */
+  .stamp{
+    position:absolute;top:24px;z-index:3;
+    font-family:"Baloo 2",cursive;font-weight:800;
+    font-size:clamp(1.5rem,6vw,1.9rem);letter-spacing:.06em;
+    padding:6px 16px;border-radius:12px;
+    border:4px solid currentColor;
+    opacity:0;pointer-events:none;
+    background:rgba(255,255,255,.7);
+  }
+  .stamp.yes{left:20px;color:var(--like);transform:rotate(-16deg)}
+  .stamp.no{right:20px;color:var(--nope);transform:rotate(16deg)}
+
+  /* ─────────── Runde Aktionsknöpfe ─────────── */
+  .actions{display:flex;align-items:center;justify-content:center;gap:clamp(16px,5vw,24px)}
+  .circle{
+    display:grid;place-items:center;
+    background:var(--paper);border:0;border-radius:50%;
+    box-shadow:0 3px 8px rgba(32,32,44,.10), 0 8px 20px rgba(32,32,44,.10);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .18s var(--pop), box-shadow .18s var(--ease), opacity .2s var(--ease);
+  }
+  .circle:hover,.circle:focus-visible{transform:scale(1.09);outline:none;box-shadow:0 4px 10px rgba(32,32,44,.13), 0 12px 28px rgba(32,32,44,.16)}
+  .circle:active{transform:scale(.92)}
+  .circle svg{display:block}
+  .circle.big{width:66px;height:66px}
+  .circle.small{width:48px;height:48px}
+  .circle.rewind svg{color:var(--rewind)}
+  .circle.nope svg{color:var(--nope)}
+  .circle.like svg{color:var(--like)}
+  .circle:disabled{opacity:.3;cursor:default;transform:none;box-shadow:0 2px 6px rgba(32,32,44,.07)}
+
+  .hint{margin-top:16px;text-align:center;font-size:.84rem;color:var(--muted)}
+
+  /* ─────────── Entscheidungsfragen ─────────── */
+  .question{
+    font-family:"Baloo 2",cursive;font-weight:700;
+    font-size:clamp(1.55rem,6.4vw,2.1rem);line-height:1.16;
+    color:var(--ink);max-width:16ch;margin-bottom:clamp(20px,5vw,28px);
+    text-wrap:balance;
+  }
+  .options{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .option{
+    position:relative;width:100%;text-align:left;
+    display:flex;align-items:center;gap:16px;
+    background:var(--paper);border:2px solid var(--line);border-radius:22px;
+    color:var(--ink);font:inherit;font-size:1.02rem;line-height:1.35;font-weight:500;
+    padding:20px 22px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    box-shadow:0 2px 6px rgba(32,32,44,.05);
+    transition:transform .2s var(--pop), border-color .2s var(--ease), box-shadow .2s var(--ease);
+  }
+  .option .emoji{flex:0 0 auto;font-size:1.9rem;line-height:1}
+  .option:hover,.option:focus-visible{
+    transform:translateY(-3px);border-color:rgba(253,38,125,.45);outline:none;
+    box-shadow:0 8px 22px rgba(253,38,125,.16);
+  }
+  .option:active{transform:translateY(-1px) scale(.99)}
+  .option[data-chosen]{
+    border-color:transparent;color:#fff;
+    background:var(--brand);
+    box-shadow:0 10px 26px rgba(253,38,125,.34);
+  }
+
+  /* ─────────── Knopf ─────────── */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    margin-top:28px;padding:16px 34px;
+    border:0;border-radius:99px;
+    background:var(--brand);color:#fff;
+    font-family:"Baloo 2",cursive;font-weight:700;font-size:1.06rem;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+    box-shadow:0 8px 22px rgba(253,38,125,.34);
+    transition:transform .18s var(--pop), box-shadow .18s var(--ease);
+  }
+  .btn:hover,.btn:focus-visible{transform:translateY(-2px) scale(1.03);outline:none;box-shadow:0 12px 30px rgba(253,38,125,.42)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:none;color:var(--pink);box-shadow:none;border:2px solid rgba(253,38,125,.35)}
+
+  /* ─────────── Schlussbildschirme ─────────── */
+  .big-heart{
+    width:96px;height:96px;margin-bottom:22px;
+    color:var(--pink);
+    animation:beat 1.5s var(--pop) infinite;
+    filter:drop-shadow(0 10px 24px rgba(253,38,125,.34));
+  }
+  @keyframes beat{
+    0%,100%{transform:scale(1)}
+    18%{transform:scale(1.16)}
+    32%{transform:scale(1)}
+    46%{transform:scale(1.09)}
+  }
+  h2.done{
+    font-family:"Baloo 2",cursive;font-weight:800;
+    font-size:clamp(2.2rem,10vw,3rem);line-height:1.05;
+    background:var(--brand);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .note{margin-top:16px;font-size:.9rem;color:var(--muted);max-width:32ch}
+
+  .dots{display:flex;gap:9px;justify-content:center;margin-bottom:22px}
+  .dots i{width:12px;height:12px;border-radius:50%;background:var(--pink);animation:bounce 1.1s ease-in-out infinite}
+  .dots i:nth-child(2){background:#FF4560;animation-delay:.14s}
+  .dots i:nth-child(3){background:var(--orange);animation-delay:.28s}
+  @keyframes bounce{0%,100%{transform:translateY(0);opacity:.45}50%{transform:translateY(-11px);opacity:1}}
+
+  /* Konfetti beim Abschluss */
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:9;overflow:hidden}
+  .confetti i{
+    position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    to{transform:translateY(105vh) rotate(760deg);opacity:0}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<main class="app">
+
+  <!-- ── Intro ── -->
+  <section class="screen" id="s-intro" data-active>
+    <div class="hero">💛</div>
+    <h1>Vier Jahre.</h1>
+    <p class="lede">Ich plane etwas für den 9. Oktober. Vorher will ich wissen, was dir daran wichtig ist.</p>
+    <p class="signoff">Gleich kommen Karten. Herz, wenn es dich anlacht. X, wenn nicht. Nicht lange überlegen.</p>
+    <button class="btn" id="start">Los geht's <span aria-hidden="true">→</span></button>
+  </section>
+
+  <!-- ── Kartenstapel ── -->
+  <section class="screen" id="s-deck">
+    <div class="segments" id="segments" aria-hidden="true"></div>
+    <div class="steps">
+      <span class="num" id="deck-count"></span>
+      <span id="deck-mood"></span>
+    </div>
+
+    <div class="deck" id="deck" aria-live="polite"></div>
+
+    <div class="actions">
+      <button class="circle small rewind" id="undo" type="button" aria-label="Letzte Karte zurückholen" disabled>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 5V2L7 6.5 12 11V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-9-8-9z"/>
+        </svg>
+      </button>
+
+      <button class="circle big nope" id="btn-no" type="button" aria-label="Eher nicht">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <button class="circle big like" id="btn-yes" type="button" aria-label="Ja, das">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
+    </div>
+
+    <p class="hint">Wischen, tippen oder die Pfeiltasten</p>
+  </section>
+
+  <!-- ── Entscheidungen ── -->
+  <section class="screen" id="s-choice">
+    <div class="steps"><span class="num" id="choice-count"></span><span>Letzter Teil</span></div>
+    <h2 class="question" id="c-text"></h2>
+    <ul class="options" id="c-options"></ul>
+    <p class="hint">Tippen oder 1 / 2 drücken</p>
+  </section>
+
+  <!-- ── Senden ── -->
+  <section class="screen" id="s-sending">
+    <div class="dots"><i></i><i></i><i></i></div>
+    <h2 class="done">Moment…</h2>
+    <p class="lede">Ich schau mir das gerade an.</p>
+  </section>
+
+  <!-- ── Fertig ── -->
+  <section class="screen" id="s-done">
+    <svg class="big-heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+    <h2 class="done" id="done-title">It's a match.</h2>
+    <p class="lede" id="done-body">Ich weiß jetzt, wohin wir fahren. Du erfährst es am 9. Oktober.</p>
+  </section>
+
+  <!-- ── Fehler ── -->
+  <section class="screen" id="s-error">
+    <div class="hero">📡</div>
+    <h2 class="done">Hm, nicht angekommen.</h2>
+    <p class="lede">Deine Antworten konnten nicht gesendet werden. Sie sind noch da, es reicht ein zweiter Versuch.</p>
+    <p class="note" id="err-detail"></p>
+    <button class="btn" id="retry">Nochmal senden</button>
+  </section>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════
+   KONFIGURATION
+   ══════════════════════════════════════════════ */
+// Production-URL des Webhooks (nicht die Test-URL, die gilt nur für einen Lauf).
+const WEBHOOK_URL = "https://n8n-dev.askconnect.de/webhook/jahrestag";
+
+// Steht identisch im n8n-Node "Spieler gültig?".
+// Liegt im Quelltext, ist also nur Spam-Schutz, kein echtes Geheimnis.
+const SECRET      = "PWpiztve8K0I72RTGU3ILGqbvpFLNtP8";
+
+// Kleinschreibung, damit ?u=Alex und ?u=alex dasselbe bedeuten.
+const PLAYER = (new URLSearchParams(location.search).get("u") || "gast")
+                 .slice(0,40).replace(/[^\w-]/g,"").toLowerCase();
+
+/* ══════════════════════════════════════════════
+   DIE 24 KARTEN
+   Reihenfolge wird beim ersten Laden gemischt.
+   Keine Dimensionen, keine Punkte, keine Ziele.
+   ══════════════════════════════════════════════ */
+const CARDS = [
+  { id:"s1",  emoji:"🛏️", text:"Nach dem Essen ins eigene Bett fallen" },
+  { id:"s2",  emoji:"🧳", text:"Der Koffer steht schon im Auto" },
+  { id:"s3",  emoji:"🥐", text:"Frühstück in einem Hotel, in dem wir noch nie waren" },
+
+  { id:"s4",  emoji:"🏘️", text:"Enge Gassen, Kopfsteinpflaster, alte Fassaden" },
+  { id:"s5",  emoji:"🏰", text:"Eine Burg, die über allem thront" },
+  { id:"s6",  emoji:"🛍️", text:"Samstagvormittag durch eine fremde Innenstadt schlendern" },
+  { id:"s25", emoji:"🥱", text:"Alte Häuser angucken sagt mir ehrlich wenig" },
+
+  { id:"s7",  emoji:"🌊", text:"Abends am Wasser entlanglaufen" },
+  { id:"s8",  emoji:"⛵", text:"Ein Boot, das ablegt, während wir zuschauen" },
+  { id:"s9",  emoji:"🏔️", text:"Berge am anderen Ufer" },
+  { id:"s26", emoji:"🤷", text:"Ob da Wasser ist oder nicht, ist mir egal" },
+
+  { id:"s10", emoji:"🍷", text:"Eine Weinkarte, die dicker ist als die Speisekarte" },
+  { id:"s11", emoji:"🍇", text:"Jemand, der uns erklärt, warum genau dieser Wein" },
+  { id:"s12", emoji:"🥤", text:"Wein ist mir ehrlich gesagt egal, Hauptsache es steht was auf dem Tisch" },
+
+  { id:"s13", emoji:"📖", text:"Ich will selbst aussuchen, worauf ich Lust habe" },
+  { id:"s14", emoji:"🍽️", text:"Sechs Gänge, und ich weiß vorher nichts davon" },
+  { id:"s15", emoji:"🕰️", text:"Der Abend dauert vier Stunden und das ist Absicht" },
+
+  { id:"s16", emoji:"🎨", text:"Etwas auf dem Teller, das ich nicht benennen kann" },
+  { id:"s17", emoji:"🍖", text:"Ein perfektes Schnitzel" },
+  { id:"s18", emoji:"🧪", text:"Zutaten, die ich noch nie zusammen gegessen habe" },
+
+  { id:"s19", emoji:"🕯️", text:"Acht Tische, gedämpftes Licht, man spricht leise" },
+  { id:"s20", emoji:"🎉", text:"Ein großer Saal, in dem etwas los ist" },
+  { id:"s21", emoji:"👨‍🍳", text:"Die Küche ist offen und wir sehen zu" },
+
+  { id:"s22", emoji:"🚗", text:"Drei Stunden Autofahrt für einen Abend" },
+  { id:"s23", emoji:"⏱️", text:"In 40 Minuten sind wir da" },
+  { id:"s24", emoji:"🛣️", text:"Der Weg dorthin gehört für mich schon zum Abend dazu" }
+];
+
+/* Pastellhintergründe für den Bildbereich der Karte */
+const ART = [
+  "linear-gradient(160deg,#FFE1EC 0%,#FFD3C2 100%)",
+  "linear-gradient(160deg,#E3F1FF 0%,#D9E6FF 100%)",
+  "linear-gradient(160deg,#DFF6E8 0%,#CFF0DC 100%)",
+  "linear-gradient(160deg,#FFF0D2 0%,#FFE0C4 100%)",
+  "linear-gradient(160deg,#EFE4FF 0%,#E2D8FF 100%)",
+  "linear-gradient(160deg,#FFE4E1 0%,#FFD9E7 100%)"
+];
+
+/* Die drei Entscheidungen am Schluss. Zählen doppelt. */
+const CHOICES = [
+  { id:"c1", text:"Wenn du dich entscheiden müsstest?",
+    options:[{emoji:"✨", label:"Ein Abend, der einfach perfekt sitzt"},
+             {emoji:"🧭", label:"Ein Wochenende, das sich wie ein kleines Abenteuer anfühlt"}] },
+  { id:"c2", text:"Und wenn du dir die Kulisse aussuchen dürftest?",
+    options:[{emoji:"🏰", label:"Altstadt und Geschichte"},
+             {emoji:"🌊", label:"Wasser und Weite"}] },
+  { id:"c3", text:"Letzte Frage.",
+    options:[{emoji:"📖", label:"Ich will genau wissen, was auf den Teller kommt"},
+             {emoji:"🎁", label:"Überrasch mich"}] }
+];
+
+/* Kleine Zwischenrufe, damit 24 Karten nicht wie 24 Karten wirken */
+const MOOD = [
+  [0,  "Los geht's"],
+  [7,  "Läuft gut"],
+  [13, "Halbzeit 🎈"],
+  [20, "Fast geschafft"],
+  [24, "Letzte Karten"]
+];
+
+/* ══════════════════════════════════════════════
+   ZUSTAND  ·  übersteht einen Reload
+   ══════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+const STORE = "jahrestag-" + PLAYER;
+
+function shuffle(list){
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const byId = Object.fromEntries(CARDS.map(c => [c.id, c]));
+const artOf = Object.fromEntries(CARDS.map((c, i) => [c.id, ART[i % ART.length]]));
+
+let saved = null;
+try { saved = JSON.parse(localStorage.getItem(STORE) || "null"); } catch(_) {}
+
+let deck = null;
+let swipes = [];
+let choices = [];
+
+if (saved && Array.isArray(saved.order)){
+  const restored = saved.order.map(id => byId[id]).filter(Boolean);
+  if (restored.length === CARDS.length){
+    deck    = restored;
+    swipes  = (saved.swipes  || []).filter(s => byId[s.id]).slice(0, CARDS.length);
+    choices = (saved.choices || []).filter(c => CHOICES.some(q => q.id === c.id)).slice(0, CHOICES.length);
+  }
+}
+if (!deck) deck = shuffle(CARDS);
+
+let ci   = choices.length;
+let busy = false;                       // sperrt Doppel-Swipes
+const TOTAL = deck.length + CHOICES.length;
+
+function persist(){
+  try {
+    localStorage.setItem(STORE, JSON.stringify({ order: deck.map(c => c.id), swipes, choices }));
+  } catch(_) {}
+}
+function forget(){ try { localStorage.removeItem(STORE); } catch(_) {} }
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.removeAttribute("data-active"));
+  $(id).setAttribute("data-active","");
+}
+
+function buzz(ms){
+  if (navigator.vibrate && !matchMedia("(prefers-reduced-motion:reduce)").matches) navigator.vibrate(ms);
+}
+
+/* Segmentleiste oben, wie die Foto-Punkte bei Tinder */
+(function buildSegments(){
+  const bar = $("segments");
+  for (let i = 0; i < deck.length; i++) bar.appendChild(document.createElement("i"));
+})();
+
+function light(){
+  const seg = $("segments").children;
+  for (let i = 0; i < seg.length; i++){
+    if (i < swipes.length) seg[i].dataset.on = i < swipes.length - 1 ? "warm" : "";
+    else delete seg[i].dataset.on;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   KARTENSTAPEL
+   ══════════════════════════════════════════════ */
+function renderDeck(){
+  const el = $("deck");
+  el.innerHTML = "";
+
+  const nr = Math.min(swipes.length + 1, deck.length);
+  $("deck-count").textContent = nr + " / " + deck.length;
+  $("undo").disabled = swipes.length === 0;
+
+  let mood = "";
+  for (const [at, txt] of MOOD) if (swipes.length >= at) mood = txt;
+  $("deck-mood").textContent = mood;
+
+  const rest = deck.slice(swipes.length, swipes.length + 3);
+
+  rest.slice().reverse().forEach((card, i) => {
+    const depth = rest.length - 1 - i;          // 0 = oberste Karte
+    const tilt  = depth === 0 ? 0 : (depth % 2 ? 1.4 : -1.4);
+    const node  = document.createElement("article");
+    node.className = "card";
+    node.style.transform = "translateY(" + (depth * 12) + "px) scale(" + (1 - depth * .04) + ") rotate(" + tilt + "deg)";
+    node.style.opacity = depth === 2 ? .55 : 1;
+    node.style.zIndex  = 10 - depth;
+    node.innerHTML =
+      '<span class="stamp yes">LIKE</span>' +
+      '<span class="stamp no">NOPE</span>' +
+      '<div class="art"><span></span></div>' +
+      '<div class="caption"><p></p></div>';
+    node.querySelector(".art").style.background = artOf[card.id];
+    node.querySelector(".art span").textContent = card.emoji;
+    node.querySelector(".caption p").textContent = card.text;
+    if (depth === 0){ node.dataset.top = ""; makeDraggable(node, card); }
+    el.appendChild(node);
+  });
+}
+
+function makeDraggable(node, card){
+  let x = 0, y = 0, startX = 0, startY = 0, dragging = false;
+  const yes = node.querySelector(".stamp.yes");
+  const no  = node.querySelector(".stamp.no");
+
+  node.addEventListener("pointerdown", e => {
+    if (busy) return;
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    node.setPointerCapture(e.pointerId);
+    node.classList.remove("settle");
+  });
+
+  node.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    x = e.clientX - startX;
+    y = e.clientY - startY;
+    node.style.transform = "translate(" + x + "px," + (y * .3) + "px) rotate(" + (x / 20) + "deg)";
+    const t = Math.min(Math.abs(x) / 85, 1);
+    yes.style.opacity = x > 0 ? t : 0;
+    no.style.opacity  = x < 0 ? t : 0;
+  });
+
+  const release = () => {
+    if (!dragging) return;
+    dragging = false;
+    if (Math.abs(x) > 90) fly(node, card, x > 0);
+    else {
+      node.classList.add("settle");
+      node.style.transform = "translate(0,0) rotate(0)";
+      yes.style.opacity = no.style.opacity = 0;
+      x = y = 0;
+    }
+  };
+  node.addEventListener("pointerup", release);
+  node.addEventListener("pointercancel", release);
+}
+
+function fly(node, card, liked){
+  if (busy) return;
+  busy = true;
+  const stamp = node.querySelector(liked ? ".stamp.yes" : ".stamp.no");
+  if (stamp) stamp.style.opacity = 1;
+  node.classList.add("settle");
+  node.style.transform = "translate(" + (liked ? 640 : -640) + "px, 60px) rotate(" + (liked ? 28 : -28) + "deg)";
+  node.style.opacity = 0;
+  swipes.push({ id: card.id, label: card.text, liked: liked });
+  persist();
+  light();
+  buzz(liked ? 16 : 10);
+  setTimeout(() => {
+    busy = false;
+    if (swipes.length < deck.length) renderDeck();
+    else { show("s-choice"); renderChoice(); }
+  }, 240);
+}
+
+function swipeTop(liked){
+  if (busy) return;
+  const node = $("deck").querySelector(".card[data-top]");
+  if (node) fly(node, deck[swipes.length], liked);
+}
+
+function undo(){
+  if (busy || swipes.length === 0) return;
+  swipes.pop();
+  persist();
+  light();
+  renderDeck();
+}
+
+$("btn-yes").addEventListener("click", () => swipeTop(true));
+$("btn-no").addEventListener("click",  () => swipeTop(false));
+$("undo").addEventListener("click", undo);
+
+document.addEventListener("keydown", e => {
+  if ($("s-deck").hasAttribute("data-active")){
+    if (e.key === "ArrowRight"){ e.preventDefault(); swipeTop(true); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); swipeTop(false); }
+    if (e.key === "Backspace") { e.preventDefault(); undo(); }
+    return;
+  }
+  if ($("s-choice").hasAttribute("data-active") && (e.key === "1" || e.key === "2")){
+    const btn = $("c-options").querySelectorAll(".option")[Number(e.key) - 1];
+    if (btn) btn.click();
+  }
+});
+
+/* ══════════════════════════════════════════════
+   ENTSCHEIDUNGEN
+   ══════════════════════════════════════════════ */
+function renderChoice(){
+  const q = CHOICES[ci];
+  $("choice-count").textContent = "Frage " + (ci + 1) + " / " + CHOICES.length;
+  $("c-text").textContent = q.text;
+  const list = $("c-options");
+  list.innerHTML = "";
+
+  q.options.forEach((opt, i) => {
+    const li  = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.type = "button";
+    btn.innerHTML = '<span class="emoji"></span><span class="label"></span>';
+    btn.querySelector(".emoji").textContent = opt.emoji;
+    btn.querySelector(".label").textContent = opt.label;
+    btn.addEventListener("click", () => {
+      if (busy) return;
+      busy = true;
+      btn.setAttribute("data-chosen","");
+      choices.push({ id:q.id, index:i, label:opt.label });
+      persist();
+      buzz(16);
+      setTimeout(() => {
+        busy = false;
+        ci++;
+        if (ci < CHOICES.length) renderChoice();
+        else send();
+      }, 320);
+    });
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+
+  const first = list.querySelector(".option");
+  if (first) first.focus({preventScroll:true});
+}
+
+/* ══════════════════════════════════════════════
+   KONFETTI
+   ══════════════════════════════════════════════ */
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const box = $("confetti");
+  const colors = ["#FD267D","#FF6036","#21D07C","#FFB800","#FF4560","#7B61FF"];
+  for (let i = 0; i < 70; i++){
+    const p = document.createElement("i");
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = (2.4 + Math.random() * 1.8) + "s";
+    p.style.animationDelay = (Math.random() * .7) + "s";
+    p.style.transform = "rotate(" + (Math.random() * 360) + "deg)";
+    box.appendChild(p);
+  }
+  setTimeout(() => { box.innerHTML = ""; }, 5200);
+}
+
+/* ══════════════════════════════════════════════
+   START · steigt dort ein, wo sie aufgehört hat
+   ══════════════════════════════════════════════ */
+if (swipes.length + choices.length > 0) $("start").innerHTML = 'Weitermachen <span aria-hidden="true">→</span>';
+
+$("start").addEventListener("click", () => {
+  light();
+  if (swipes.length < deck.length){ show("s-deck"); renderDeck(); }
+  else if (ci < CHOICES.length)   { show("s-choice"); renderChoice(); }
+  else send();
+});
+$("retry").addEventListener("click", send);
+
+/* ══════════════════════════════════════════════
+   SENDEN
+   ══════════════════════════════════════════════ */
+async function send(){
+  show("s-sending");
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        secret: SECRET,
+        player: PLAYER,
+        submitted_at: new Date().toISOString(),
+        swipes: swipes,
+        choices: choices
+      })
+    });
+    if (!res.ok) throw new Error("Server hat mit Status " + res.status + " geantwortet.");
+
+    let data = null;
+    try { data = await res.json(); } catch(_) {}
+    if (Array.isArray(data)) data = data[0];
+    // akzeptiert { title, body } genauso wie { fuer_sie: { title, body } }
+    const txt = (data && data.fuer_sie) ? data.fuer_sie : data;
+    if (txt && txt.title) $("done-title").textContent = txt.title;
+    if (txt && txt.body)  $("done-body").textContent  = txt.body;
+
+    forget();
+    show("s-done");
+    confetti();
+  } catch (err) {
+    $("err-detail").textContent = err.message;
+    show("s-error");
+  }
+}
+</script>
+</body>
+</html>
